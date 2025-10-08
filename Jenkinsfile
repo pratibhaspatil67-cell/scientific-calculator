@@ -11,11 +11,15 @@ pipeline {
       }
     }
     stage('Install deps & Test') {
-      steps {
-        sh 'python3 -m pip install --user -r requirements.txt'
-        sh 'pytest -q'
-      }
-    }
+  steps {
+    sh '''
+      python3 -m venv venv
+      . venv/bin/activate
+      pip install -r requirements.txt
+      pytest -q
+    '''
+  }
+}
     stage('Build Docker Image') {
       steps {
         script {
