@@ -1,0 +1,24 @@
+- hosts: local
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: pull docker image
+      community.docker.docker_image:
+        name: "{{ image }}"
+        source: pull
+
+    - name: stop existing container if any
+      community.docker.docker_container:
+        name: scientific_calc
+        state: absent
+      ignore_errors: true
+
+    - name: run container
+      community.docker.docker_container:
+        name: scientific_calc
+        image: "{{ image }}"
+        state: started
+        restart_policy: always
+        published_ports:
+          - "5000:5000"
+
