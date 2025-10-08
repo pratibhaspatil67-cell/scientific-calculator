@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'python:3.9-slim'
-      args '-v /home/jenkins:/home/jenkins'
-    }
-  }
+  agent any
   environment {
     DOCKERHUB_CREDENTIALS = 'docker-hub-creds'
     DOCKERHUB_REPO = 'madhavsanjaypatil/scientific-calc'
@@ -18,9 +13,7 @@ pipeline {
     stage('Install deps & Test') {
       steps {
         sh '''
-          python -m venv venv
-          . venv/bin/activate
-          pip install -r requirements.txt
+          python3 -m pip install --break-system-packages --user -r requirements.txt
           pytest -q
         '''
       }
@@ -54,9 +47,6 @@ pipeline {
     }
     failure { 
       echo 'Pipeline failed' 
-    }
-    always {
-      sh 'docker logout'
     }
   }
 }
