@@ -1,8 +1,13 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'python:3.9-slim'
+      args '-v /home/jenkins:/home/jenkins'
+    }
+  }
   environment {
-    DOCKERHUB_CREDENTIALS = 'docker-hub-creds' // create in Jenkins store
-    DOCKERHUB_REPO = 'madhavsanjaypatil/scientific-calc' // change this
+    DOCKERHUB_CREDENTIALS = 'docker-hub-creds'
+    DOCKERHUB_REPO = 'madhavsanjaypatil/scientific-calc'
   }
   stages {
     stage('Checkout') {
@@ -11,15 +16,15 @@ pipeline {
       }
     }
     stage('Install deps & Test') {
-  steps {
-    sh '''
-      python3 -m venv venv
-      . venv/bin/activate
-      pip install -r requirements.txt
-      pytest -q
-    '''
-  }
-}
+      steps {
+        sh '''
+          python -m venv venv
+          . venv/bin/activate
+          pip install -r requirements.txt
+          pytest -q
+        '''
+      }
+    }
     stage('Build Docker Image') {
       steps {
         script {
@@ -44,7 +49,14 @@ pipeline {
     }
   }
   post {
-    success { echo 'Pipeline succeeded' }
-    failure { echo 'Pipeline failed' }
+    success { 
+      echo 'Pipeline succeeded' 
+    }
+    failure { 
+      echo 'Pipeline failed' 
+    }
+    always {
+      sh 'docker logout'
+    }
   }
 }
