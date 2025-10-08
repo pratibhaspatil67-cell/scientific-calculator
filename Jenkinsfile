@@ -13,15 +13,13 @@ pipeline {
 
     stage('Install deps & Test') {
       steps {
-        // Use a virtual environment to avoid system Python restrictions (PEP 668)
-        sh '''
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          pytest -q
-        '''
-      }
+          sh '''
+            python3 -m venv venv
+            venv/bin/pip install --upgrade pip
+            venv/bin/pip install -r requirements.txt
+            venv/bin/pytest -q
+          '''
+        }
     }
 
     stage('Build Docker Image') {
