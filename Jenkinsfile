@@ -14,7 +14,7 @@ pipeline {
       steps {
         sh '''
           python3 -m pip install --break-system-packages --user -r requirements.txt
-          pytest -q
+          python3 -m pytest -q
         '''
       }
     }
@@ -50,5 +50,3 @@ pipeline {
     }
   }
 }
-
-
