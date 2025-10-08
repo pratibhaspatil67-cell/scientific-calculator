@@ -14,10 +14,11 @@ pipeline {
     stage('Install deps & Test') {
       steps {
           sh '''
-      python3 -m pip install --user --upgrade pip
-      python3 -m pip install --user -r requirements.txt
-      python3 -m pytest -q
-        '''
+      python3 -m venv venv
+      venv/bin/pip install --upgrade pip
+      venv/bin/pip install -r requirements.txt
+      venv/bin/pytest -q
+    '''
         }
     }
 
