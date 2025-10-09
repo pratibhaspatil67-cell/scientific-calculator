@@ -55,40 +55,34 @@ pipeline {
   } // end stages
 
    post {
-    success {
-      echo 'Pipeline succeeded'
-      emailext (
-        to: 'your_email@gmail.com',
-        subject: "✅ SUCCESS: Jenkins Build #${env.BUILD_NUMBER}",
-        body: """
-        <p>Hi Madhav,</p>
-        <p>Your Scientific Calculator CI/CD pipeline succeeded 🎉</p>
-        <ul>
-          <li><b>Build #:</b> ${env.BUILD_NUMBER}</li>
-          <li><b>Git Commit:</b> ${env.GIT_COMMIT}</li>
-          <li><b>Docker Image:</b> ${env.IMAGE_TAG}</li>
-        </ul>
-        <p>Check your Docker Hub repo for the pushed image.</p>
-        <p>– Jenkins CI/CD System</p>
-        """,
-        mimeType: 'text/html'
-      )
-    }
-    failure {
-      echo 'Pipeline failed'
-      emailext (
-        to: 'your_email@gmail.com',
-        subject: "❌ FAILURE: Jenkins Build #${env.BUILD_NUMBER}",
-        body: """
-        <p>Hi Madhav,</p>
-        <p>Your Scientific Calculator pipeline failed ⚠️</p>
-        <p>Please check the Jenkins console output for details.</p>
-        <p>– Jenkins CI/CD System</p>
-        """,
-        mimeType: 'text/html'
-      )
-    }
+  success {
+    emailext (
+      subject: "✅ SUCCESS: Scientific Calculator Build #${env.BUILD_NUMBER}",
+      body: """
+      <p>Build Details:</p>
+      <ul>
+        <li><b>Build Number:</b> ${env.BUILD_NUMBER}</li>
+        <li><b>Job:</b> ${env.JOB_NAME}</li>
+        <li><b>Docker Image:</b> ${env.IMAGE_TAG}</li>
+        <li><b>Build URL:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></li>
+      </ul>
+      """,
+      to: 'your_email@gmail.com',
+      mimeType: 'text/html'
+    )
   }
+  failure {
+    emailext (
+      subject: "❌ FAILURE: Scientific Calculator Build #${env.BUILD_NUMBER}",
+      body: """
+      <p>The build has failed. Please check:</p>
+      <p><a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+      """,
+      to: 'your_email@gmail.com',
+      mimeType: 'text/html'
+    )
+  }
+}
 
 
 } // end pipeline
