@@ -4,7 +4,6 @@ pipeline {
   environment {
     DOCKERHUB_CREDENTIALS = 'docker-hub-creds'
     DOCKERHUB_REPO = 'madhavsanjaypatil/scientific-calc'
-    RECIPIENT_EMAIL = 'dev-team@yourcompany.com'  // Add your email here
   }
 
   stages {
@@ -55,126 +54,35 @@ pipeline {
 
   } // end stages
 
-  post {
-    always {
-      script {
-        // Prepare email content based on build status
-        def subject = "${currentBuild.result ?: 'SUCCESS'} - Build #${env.BUILD_NUMBER} - ${env.JOB_NAME}"
-        
-        def body = """
-        Build Result: ${currentBuild.result ?: 'SUCCESS'}
-        Project: ${env.JOB_NAME}
-        Build Number: ${env.BUILD_NUMBER}
-        Build URL: ${env.BUILD_URL}
-        Docker Image: ${env.IMAGE_TAG ?: 'N/A'}
-        
-        Stage Status:
-        ${getStageStatus()}
-        
-        ---
-        This is an automated message from Jenkins CI/CD
-        """
-        
-        echo "Sending build notification email..."
-      }
-    }
-    
-    success {
-      script {
-        emailext (
-          subject: "SUCCESS - Build #${env.BUILD_NUMBER} - ${env.JOB_NAME}",
-          body: """
-          ✅ BUILD SUCCESSFUL ✅
-          
-          Project: ${env.JOB_NAME}
-          Build Number: ${env.BUILD_NUMBER}
-          Build URL: ${env.BUILD_URL}
-          Docker Image: ${env.IMAGE_TAG ?: 'N/A'}
-          Duration: ${currentBuild.durationString}
-          
-          All stages completed successfully:
-          ${getStageStatus()}
-          
-          The application has been deployed with the new Docker image.
-          
-          ---
-          This is an automated message from Jenkins CI/CD
-          """,
-          to: "${env.RECIPIENT_EMAIL}",
-          attachLog: false
-        )
-      }
-    }
-    
-    failure {
-      script {
-        emailext (
-          subject: "FAILED - Build #${env.BUILD_NUMBER} - ${env.JOB_NAME}",
-          body: """
-          ❌ BUILD FAILED ❌
-          
-          Project: ${env.JOB_NAME}
-          Build Number: ${env.BUILD_NUMBER}
-          Build URL: ${env.BUILD_URL}
-          Failed Stage: ${getFailedStage()}
-          Duration: ${currentBuild.durationString}
-          
-          Stage Status:
-          ${getStageStatus()}
-          
-          Please check the build logs for details: ${env.BUILD_URL}console
-          
-          ---
-          This is an automated message from Jenkins CI/CD
-          """,
-          to: "${env.RECIPIENT_EMAIL}",
-          attachLog: true,  // Attach build log for failures
-          compressLog: true
-        )
-      }
-    }
-    
-    unstable {
-      script {
-        emailext (
-          subject: "UNSTABLE - Build #${env.BUILD_NUMBER} - ${env.JOB_NAME}",
-          body: """
-          ⚠️ BUILD UNSTABLE ⚠️
-          
-          Project: ${env.JOB_NAME}
-          Build Number: ${env.BUILD_NUMBER}
-          Build URL: ${env.BUILD_URL}
-          Duration: ${currentBuild.durationString}
-          
-          Stage Status:
-          ${getStageStatus()}
-          
-          Build completed but with test failures or other issues.
-          
-          ---
-          This is an automated message from Jenkins CI/CD
-          """,
-          to: "${env.RECIPIENT_EMAIL}",
-          attachLog: false
-        )
-      }
-    }
+   post {
+  success {
+    emailext (
+      subject: "✅ SUCCESS: Scientific Calculator Build #${env.BUILD_NUMBER}",
+      body: """
+      <p>Build Details:</p>
+      <ul>
+        <li><b>Build Number:</b> ${env.BUILD_NUMBER}</li>
+        <li><b>Job:</b> ${env.JOB_NAME}</li>
+        <li><b>Docker Image:</b> ${env.IMAGE_TAG}</li>
+        <li><b>Build URL:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></li>
+      </ul>
+      """,
+      to: 'madhavspatil07@gmail.com',
+      mimeType: 'text/html'
+    )
+  }
+  failure {
+    emailext (
+      subject: "❌ FAILURE: Scientific Calculator Build #${env.BUILD_NUMBER}",
+      body: """
+      <p>The build has failed. Please check:</p>
+      <p><a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+      """,
+      to: 'madhavspatil07@gmail.com',
+      mimeType: 'text/html'
+    )
   }
 }
 
-// Helper function to get stage status
-def getStageStatus() {
-  def stages = currentBuild.rawBuild.getStages()
-  def statusText = ""
-  stages.each { stage ->
-    statusText += "- ${stage.name}: ${stage.status}\n"
-  }
-  return statusText
-}
 
-// Helper function to get failed stage
-def getFailedStage() {
-  def stages = currentBuild.rawBuild.getStages()
-  def failedStage = stages.find { stage -> stage.status.toString() == 'FAILED' }
-  return failedStage ? failedStage.name : 'Unknown'
-}
+} // end pipeline
