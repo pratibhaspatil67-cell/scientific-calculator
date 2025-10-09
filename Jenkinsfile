@@ -57,7 +57,7 @@ pipeline {
     success {
       echo 'Pipeline succeeded!'
       emailext(
-        to: 'madhavspatil07@gmail.com, drpatils@hotmail.com',  // Add multiple recipients here
+        to: 'madhavspatil07@gmail.com',  // Add multiple recipients here
         subject: "✅ SUCCESS: Scientific Calculator Pipeline #${env.BUILD_NUMBER}",
         body: """
           <h3>🎉 Jenkins Pipeline Successful!</h3>
@@ -74,7 +74,7 @@ pipeline {
     failure {
       echo 'Pipeline failed!'
       emailext(
-        to: 'madhavspatil07@gmail.com, drpatils@hotmail.com',
+        to: 'madhavspatil07@gmail.com',
         subject: "❌ FAILURE: Scientific Calculator Pipeline #${env.BUILD_NUMBER}",
         body: """
           <h3>🚨 Jenkins Pipeline Failed</h3>
