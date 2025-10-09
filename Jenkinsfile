@@ -53,15 +53,17 @@ pipeline {
     }
   }
 
-  post {
-    success {
-      echo 'Pipeline succeeded!'
+ post {
+  success {
+    echo 'Pipeline succeeded!'
+    script {
+      def gitUrl = scm.userRemoteConfigs[0].url
       emailext(
-        to: 'madhavspatil07@gmail.com',  // Add multiple recipients here
+        to: 'madhavspatil07@gmail.com,drpatils@hotmail.com',
         subject: "✅ SUCCESS: Scientific Calculator Pipeline #${env.BUILD_NUMBER}",
         body: """
           <h3>🎉 Jenkins Pipeline Successful!</h3>
-          <p><b>Repository:</b> ${env.GIT_URL}</p>
+          <p><b>Repository:</b> ${gitUrl}</p>
           <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
           <p><b>Docker Image:</b> ${env.IMAGE_TAG}</p>
           <p>The image has been successfully pushed to Docker Hub and deployed via Ansible.</p>
@@ -70,15 +72,18 @@ pipeline {
         mimeType: 'text/html'
       )
     }
+  }
 
-    failure {
-      echo 'Pipeline failed!'
+  failure {
+    echo 'Pipeline failed!'
+    script {
+      def gitUrl = scm.userRemoteConfigs[0].url
       emailext(
-        to: 'madhavspatil07@gmail.com',
+        to: 'madhavspatil07@gmail.com,drpatils@hotmail.com',
         subject: "❌ FAILURE: Scientific Calculator Pipeline #${env.BUILD_NUMBER}",
         body: """
           <h3>🚨 Jenkins Pipeline Failed</h3>
-          <p><b>Repository:</b> ${env.GIT_URL}</p>
+          <p><b>Repository:</b> ${gitUrl}</p>
           <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
           <p>Please check the Jenkins logs for detailed failure reasons.</p>
         """,
