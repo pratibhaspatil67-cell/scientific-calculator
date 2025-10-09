@@ -2,8 +2,8 @@ pipeline {
   agent any
 
   environment {
-    DOCKERHUB_CREDENTIALS = 'docker-hub-creds'   // Jenkins credentials ID for DockerHub
-    DOCKERHUB_REPO = 'madhavsanjaypatil/scientific-calc'  // Change if needed
+    DOCKERHUB_CREDENTIALS = 'docker-hub-creds'
+    DOCKERHUB_REPO = 'madhavsanjaypatil/scientific-calc'
   }
 
   stages {
@@ -51,44 +51,47 @@ pipeline {
         sh "ansible-playbook -i ansible/inventory.ini ansible/deploy.yml --extra-vars \"image=${env.IMAGE_TAG}\""
       }
     }
-  }
 
- post {
-  success {
-    echo 'Pipeline succeeded!'
-    script {
-      def gitUrl = scm.userRemoteConfigs[0].url
-      emailext(
-        to: 'madhavspatil07@gmail.com,drpatils@hotmail.com',
-        subject: "✅ SUCCESS: Scientific Calculator Pipeline #${env.BUILD_NUMBER}",
-        body: """
-          <h3>🎉 Jenkins Pipeline Successful!</h3>
-          <p><b>Repository:</b> ${gitUrl}</p>
-          <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
-          <p><b>Docker Image:</b> ${env.IMAGE_TAG}</p>
-          <p>The image has been successfully pushed to Docker Hub and deployed via Ansible.</p>
-          <p>Visit Docker Hub: <a href="https://hub.docker.com/repository/docker/madhavsanjaypatil/scientific-calc">View Image</a></p>
-        """,
-        mimeType: 'text/html'
-      )
+  } // end stages
+
+  post {
+    success {
+      echo 'Pipeline succeeded!'
+      script {
+        def gitUrl = scm.userRemoteConfigs[0].url
+        emailext(
+          to: 'madhavspatil07@gmail.com,drpatils@hotmail.com',
+          subject: "✅ SUCCESS: Scientific Calculator Pipeline #${env.BUILD_NUMBER}",
+          body: """
+            <h3>🎉 Jenkins Pipeline Successful!</h3>
+            <p><b>Repository:</b> ${gitUrl}</p>
+            <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
+            <p><b>Docker Image:</b> ${env.IMAGE_TAG}</p>
+            <p>The image has been successfully pushed to Docker Hub and deployed via Ansible.</p>
+            <p>Visit Docker Hub: <a href="https://hub.docker.com/repository/docker/madhavsanjaypatil/scientific-calc">View Image</a></p>
+          """,
+          mimeType: 'text/html'
+        )
+      }
+    }
+
+    failure {
+      echo 'Pipeline failed!'
+      script {
+        def gitUrl = scm.userRemoteConfigs[0].url
+        emailext(
+          to: 'madhavspatil07@gmail.com,drpatils@hotmail.com',
+          subject: "❌ FAILURE: Scientific Calculator Pipeline #${env.BUILD_NUMBER}",
+          body: """
+            <h3>🚨 Jenkins Pipeline Failed</h3>
+            <p><b>Repository:</b> ${gitUrl}</p>
+            <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
+            <p>Please check the Jenkins logs for detailed failure reasons.</p>
+          """,
+          mimeType: 'text/html'
+        )
+      }
     }
   }
 
-  failure {
-    echo 'Pipeline failed!'
-    script {
-      def gitUrl = scm.userRemoteConfigs[0].url
-      emailext(
-        to: 'madhavspatil07@gmail.com,drpatils@hotmail.com',
-        subject: "❌ FAILURE: Scientific Calculator Pipeline #${env.BUILD_NUMBER}",
-        body: """
-          <h3>🚨 Jenkins Pipeline Failed</h3>
-          <p><b>Repository:</b> ${gitUrl}</p>
-          <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
-          <p>Please check the Jenkins logs for detailed failure reasons.</p>
-        """,
-        mimeType: 'text/html'
-      )
-    }
-  }
-}
+} // end pipeline
