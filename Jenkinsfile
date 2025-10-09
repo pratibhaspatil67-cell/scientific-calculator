@@ -54,44 +54,41 @@ pipeline {
 
   } // end stages
 
-  post {
+   post {
     success {
-      echo 'Pipeline succeeded!'
-      script {
-        def gitUrl = scm.userRemoteConfigs[0].url
-        emailext(
-          to: 'madhavspatil07@gmail.com,drpatils@hotmail.com',
-          subject: "✅ SUCCESS: Scientific Calculator Pipeline #${env.BUILD_NUMBER}",
-          body: """
-            <h3>🎉 Jenkins Pipeline Successful!</h3>
-            <p><b>Repository:</b> ${gitUrl}</p>
-            <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
-            <p><b>Docker Image:</b> ${env.IMAGE_TAG}</p>
-            <p>The image has been successfully pushed to Docker Hub and deployed via Ansible.</p>
-            <p>Visit Docker Hub: <a href="https://hub.docker.com/repository/docker/madhavsanjaypatil/scientific-calc">View Image</a></p>
-          """,
-          mimeType: 'text/html'
-        )
-      }
+      echo 'Pipeline succeeded'
+      emailext (
+        to: 'your_email@gmail.com',
+        subject: "✅ SUCCESS: Jenkins Build #${env.BUILD_NUMBER}",
+        body: """
+        <p>Hi Madhav,</p>
+        <p>Your Scientific Calculator CI/CD pipeline succeeded 🎉</p>
+        <ul>
+          <li><b>Build #:</b> ${env.BUILD_NUMBER}</li>
+          <li><b>Git Commit:</b> ${env.GIT_COMMIT}</li>
+          <li><b>Docker Image:</b> ${env.IMAGE_TAG}</li>
+        </ul>
+        <p>Check your Docker Hub repo for the pushed image.</p>
+        <p>– Jenkins CI/CD System</p>
+        """,
+        mimeType: 'text/html'
+      )
     }
-
     failure {
-      echo 'Pipeline failed!'
-      script {
-        def gitUrl = scm.userRemoteConfigs[0].url
-        emailext(
-          to: 'madhavspatil07@gmail.com,drpatils@hotmail.com',
-          subject: "❌ FAILURE: Scientific Calculator Pipeline #${env.BUILD_NUMBER}",
-          body: """
-            <h3>🚨 Jenkins Pipeline Failed</h3>
-            <p><b>Repository:</b> ${gitUrl}</p>
-            <p><b>Build Number:</b> ${env.BUILD_NUMBER}</p>
-            <p>Please check the Jenkins logs for detailed failure reasons.</p>
-          """,
-          mimeType: 'text/html'
-        )
-      }
+      echo 'Pipeline failed'
+      emailext (
+        to: 'your_email@gmail.com',
+        subject: "❌ FAILURE: Jenkins Build #${env.BUILD_NUMBER}",
+        body: """
+        <p>Hi Madhav,</p>
+        <p>Your Scientific Calculator pipeline failed ⚠️</p>
+        <p>Please check the Jenkins console output for details.</p>
+        <p>– Jenkins CI/CD System</p>
+        """,
+        mimeType: 'text/html'
+      )
     }
   }
+
 
 } // end pipeline
